@@ -8,7 +8,7 @@
 # Description: Build OpenWrt using GitHub Actions
 #
 
-name: Build OpenWrt
+name: Build aml4.9
 
 on:
   repository_dispatch:
@@ -68,19 +68,7 @@ jobs:
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P1_SH
 
-   # - name: Update feeds
-    #  run: cd openwrt && ./scripts/feeds update -a
-
-   # - name: Install feeds
-   #   run: cd openwrt && ./scripts/feeds install -a
-
-   # - name: Load custom configuration
-    #  run: |
-   #     [ -e files ] && mv files openwrt/files
-    #    [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
-   #     chmod +x $DIY_P2_SH
-   #     cd openwrt
-   #     $GITHUB_WORKSPACE/$DIY_P2_SH
+  
 
     - name: SSH connection to Actions
       uses: P3TERX/ssh2actions@v1.0.0
@@ -179,7 +167,14 @@ jobs:
       with:
         retain_days: 1
         keep_minimum_runs: 3
-
+    - name: Remove old Releases
+      uses: dev-drprasad/delete-older-releases@v0.1.0
+      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      with:
+        keep_latest: 3
+        delete_tags: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Remove old Releases
       uses: dev-drprasad/delete-older-releases@v0.1.0
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
